@@ -106,5 +106,5 @@ def download_image(url, filename, folder='images'):
 def fetch_image(url):
     response = requests.get(url)
     response.raise_for_status()
-    tululu_logger.debug(f'Text was fetched on url: {url}')
+    tululu_logger.debug(f'Image was fetched on url: {url}')
     return response.content
