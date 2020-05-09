@@ -94,8 +94,8 @@ def get_page_book_urls(page_url):
     webpage = fetch_category_webpage(page_url)
     if not webpage:
         return
-    book_tables = webpage.select('.ow_px_td .d_book')
-    book_urls = [urljoin(page_url, book_table.select_one('a')['href']) for book_table in book_tables]
+    book_tags = webpage.select('.ow_px_td .d_book')
+    book_urls = [urljoin(page_url, book_tag.select_one('a')['href']) for book_tag in book_tags]
     category_logger.debug(f'Got urls form page "{page_url}"')
     return book_urls
 
