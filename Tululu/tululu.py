@@ -9,7 +9,6 @@ from pathvalidate import sanitize_filename
 tululu_logger = logging.getLogger('tululu_logger')
 
 
-# Book info
 def fetch_book_webpage(book_url):
     response = requests.get(book_url, allow_redirects=False)
     response.raise_for_status()
@@ -37,10 +36,7 @@ def get_book_genres(book_webpage):
     genre_tags = book_webpage.select('span.d_book a')
     genres = [genre.text for genre in genre_tags]
     return genres
-# End book info
 
-
-# Text
 def download_book_text(book_id, book_title, dest_folder):
     filename = f'{book_id}. {book_title}'
     filepath = os.path.join(dest_folder, 'books')
@@ -81,10 +77,7 @@ def collect_filepath(filename, folder):
     filepath = os.path.join(folder, filename)
     tululu_logger.debug(f'Filepath "{filepath}" was collected')
     return filepath
-# End text
 
-
-# Image
 def download_book_image(book_url, book_webpage, dest_folder):
     image_url = fetch_image_url(book_webpage, book_url)
     filepath = os.path.join(dest_folder, 'images')
@@ -115,4 +108,3 @@ def fetch_image(url):
     response.raise_for_status()
     tululu_logger.debug(f'Text was fetched on url: {url}')
     return response.content
-# End image

@@ -79,8 +79,6 @@ def download_category_books(category_url, start_page, end_page, json_path):
     download_book(book_urls[3])
     category_logger.debug('Books were saved')
 
-
-# Urls
 def get_category_book_urls(category_url, start_page, end_page):
     book_urls = []
     for page in range(start_page, end_page):
@@ -109,10 +107,7 @@ def fetch_category_webpage(page_url):
         return
     category_logger.debug(f'Category webpage was fetched')
     return BeautifulSoup(response.text, 'lxml')
-# End urls
 
-
-# Book
 def download_book(book_url):
     global dest_folder, skip_imgs, skip_txt
     book_path = ''
@@ -156,7 +151,6 @@ def save_json(info, filename, json_path=''):
         json.dump(info, file, ensure_ascii=False)
     category_logger.debug(f'Json saved to {filename}')
     return filename
-# End book
 
 
 if __name__ == '__main__':
