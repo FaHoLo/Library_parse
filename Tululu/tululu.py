@@ -27,7 +27,7 @@ def get_book_title_and_author(book_webpage):
 def get_book_comments(book_webpage):
     comment_tags = book_webpage.select('.texts .black')
     comments = [comment.text for comment in comment_tags]
-    tululu_logger.debug(f'Got comments to book')
+    tululu_logger.debug(f'Got book comments')
     return comments
 
 def get_book_genres(book_webpage):
