@@ -60,13 +60,13 @@ def fetch_text(url):
 
 def save_txt(text, filename, folder):
     filename = f'{filename}.txt'
-    filepath = collect_filepath(filename, folder)
+    filepath = build_filepath(filename, folder)
     with open(filepath, 'w') as file:
         file.write(text)
     tululu_logger.debug(f'Text was saved to {filepath}')
     return filepath
 
-def collect_filepath(filename, folder):
+def build_filepath(filename, folder):
     filename = sanitize_filename(filename)
     folder = folder.rstrip('/\\')
     os.makedirs(folder, exist_ok=True)
@@ -90,7 +90,7 @@ def fetch_image_url(book_webpage, book_url):
 
 def download_image(url, filename, folder='images'):
     image = fetch_image(url)
-    filepath = collect_filepath(filename, folder)
+    filepath = build_filepath(filename, folder)
     if os.path.exists(filepath):
         tululu_logger.debug(f'Image with such name "{filename}" already exists')
         return filepath
