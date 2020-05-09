@@ -36,29 +36,20 @@ def download_book_text(book_id, book_title, dest_folder):
     return txt_path
 
 def download_txt(url, filename, folder='books'):
-    response = get_response_or_none(url)
-    if not response:
-        return
+    response = get_response(url)
     text = response.text
     filepath = save_txt(text, filename, folder)
     tululu_logger.debug(f'Text was downloaded to {filepath}')
     return filepath
 
-def get_response_or_none(url):
+def get_response(url):
     response = requests.get(url, allow_redirects=False)
-    if not is_good_response(response):
-        return
+    check_response(response)
     return response
 
-def is_good_response(response):
-    try:
-        response.raise_for_status()
-        if response.status_code in [301, 302, 303, 307, 308]:
-            tululu_logger.debug('Wrong url. Redirect')
-            raise requests.HTTPError()
-    except requests.HTTPError:
-        return 
-    return True
+def check_response(response):
+    if response.status_code >= 300:
+        raise requests.HTTPError()
 
 def save_txt(text, filename, folder):
     filename = f'{filename}.txt'
@@ -102,6 +93,6 @@ def download_image(url, filename, folder='images'):
     return filepath
 
 def fetch_image(url):
-    response = get_response_or_none(url)
+    response = get_response(url)
     tululu_logger.debug(f'Image was fetched on url: {url}')
     return response.content

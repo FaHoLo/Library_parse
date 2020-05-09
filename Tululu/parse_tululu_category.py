@@ -1,12 +1,12 @@
-
 import os
 import json
 import tululu
 import logging
 import argparse
-import requests
+from time import sleep
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from requests import HTTPError, ConnectionError
 
 
 category_logger = logging.getLogger('category_logger')
@@ -65,35 +65,44 @@ def handle_json_arg(json_path):
 
 def download_category_books(category_url, start_page, end_page, json_path):
     book_urls = get_category_book_urls(category_url, start_page, end_page)
-    book_descriptions = list(filter(None, [download_book(url) for url in book_urls]))
+    book_descriptions = []
+    for url in book_urls:
+        try:
+            book_descriptions.append(download_book(url))
+        except HTTPError:
+            continue
+        except ConnectionError:
+            category_logger.debug('Start sleeping')
+            sleep(10)
+            continue
     save_json(book_descriptions, 'book_descriptions', json_path)
-    download_book(book_urls[3])
     category_logger.debug('Books were saved')
 
 def get_category_book_urls(category_url, start_page, end_page):
     book_urls = []
     for page in range(start_page, end_page):
         page_url = f'{category_url}/{page}/'
-        urls = get_page_book_urls(page_url)
-        if not urls:
+        try:
+            urls = get_page_book_urls(page_url)
+        except HTTPError:
             break
+        except ConnectionError:
+            category_logger.debug('Start sleeping')
+            sleep(10)
+            continue
         book_urls.extend(urls)
     category_logger.debug(f'Got {len(book_urls)} book urls')
     return book_urls
     
 def get_page_book_urls(page_url):
     webpage = parse_webpage(page_url)
-    if not webpage:
-        return
     book_tags = webpage.select('.ow_px_td .d_book')
     book_urls = [urljoin(page_url, book_tag.select_one('a')['href']) for book_tag in book_tags]
     category_logger.debug(f'Got urls form page "{page_url}"')
     return book_urls
 
 def parse_webpage(url):
-    response = tululu.get_response_or_none(url)
-    if not response:
-        return
+    response = tululu.get_response(url)
     return BeautifulSoup(response.text, 'lxml')
 
 def download_book(book_url):
@@ -104,8 +113,6 @@ def download_book(book_url):
     title, author = tululu.get_book_title_and_author(book_webpage)
     if not SKIP_TXT:
         book_path = tululu.download_book_text(book_id, title, DEST_FOLDER)
-        if not book_path:
-            return
     if not SKIP_IMGS:
         image_path = tululu.download_book_image(book_url, book_webpage, DEST_FOLDER)
     book_description = collect_book_description(book_webpage, book_path, image_path, title, author)
