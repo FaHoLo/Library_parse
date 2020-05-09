@@ -1,6 +1,6 @@
-# Book parser for [tululu.org](ttp://tululu.org)
+# Book parser for [tululu.org](http://tululu.org)
 
-The project was created for parse books from [tululu.org](ttp://tululu.org).
+The project was created for parse books from [tululu.org](http://tululu.org).
 
 [Russian doc](https://github.com/FaHoLo/Library_parse/blob/master/READMEru.md)
 

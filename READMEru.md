@@ -1,6 +1,6 @@
-# Парсер книг с сайта [tululu.org](ttp://tululu.org)
+# Парсер книг с сайта [tululu.org](http://tululu.org)
 
-Проект был создан для парсинга книг с сайта [tululu.org](ttp:/tululu.org).
+Проект был создан для парсинга книг с сайта [tululu.org](http:/tululu.org).
 
 ### Установка
 
