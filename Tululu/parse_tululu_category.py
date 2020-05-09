@@ -46,10 +46,8 @@ def handle_global_args(args):
     if args.dest_folder:
         dest_folder =  args.dest_folder
         os.makedirs(dest_folder, exist_ok=True)
-    if args.skip_imgs:
-        skip_imgs = True
-    if args.skip_txt:
-        skip_txt = True
+    skip_imgs = args.skip_imgs
+    skip_txt = args.skip_txt
 
 def handle_page_args(start_page, end_page):
     if not start_page:
