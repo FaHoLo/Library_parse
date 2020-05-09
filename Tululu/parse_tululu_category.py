@@ -82,7 +82,7 @@ def get_category_book_urls(category_url, start_page, end_page):
     return book_urls
     
 def get_page_book_urls(page_url):
-    webpage = fetch_category_webpage(page_url)
+    webpage = parse_webpage(page_url)
     if not webpage:
         return
     book_tags = webpage.select('.ow_px_td .d_book')
@@ -90,18 +90,17 @@ def get_page_book_urls(page_url):
     category_logger.debug(f'Got urls form page "{page_url}"')
     return book_urls
 
-def fetch_category_webpage(page_url):
-    response = requests.get(page_url, allow_redirects=False)
-    if not tululu.is_good_response(response):
+def parse_webpage(url):
+    response = tululu.get_response_or_none(url)
+    if not response:
         return
-    category_logger.debug(f'Category webpage was fetched')
     return BeautifulSoup(response.text, 'lxml')
 
 def download_book(book_url):
     book_path = ''
     image_path = ''
     book_id = book_url.split('/')[-2][1:]
-    book_webpage = tululu.fetch_book_webpage(book_url)
+    book_webpage = parse_webpage(book_url)
     title, author = tululu.get_book_title_and_author(book_webpage)
     if not SKIP_TXT:
         book_path = tululu.download_book_text(book_id, title, DEST_FOLDER)

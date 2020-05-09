@@ -1,20 +1,12 @@
 import os
 import logging
 import requests
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pathvalidate import sanitize_filename
 
 
 tululu_logger = logging.getLogger('tululu_logger')
 
-
-def fetch_book_webpage(book_url):
-    response = requests.get(book_url, allow_redirects=False)
-    if not is_good_response(response):
-        return
-    tululu_logger.debug(f'Book webpage was fetched')
-    return BeautifulSoup(response.text, 'lxml')
 
 def get_book_title_and_author(book_webpage):
     title_tag = book_webpage.select_one('h1')
@@ -44,19 +36,29 @@ def download_book_text(book_id, book_title, dest_folder):
     return txt_path
 
 def download_txt(url, filename, folder='books'):
-    text = fetch_text(url)
-    if not text:
+    response = get_response_or_none(url)
+    if not response:
         return
+    text = response.text
     filepath = save_txt(text, filename, folder)
     tululu_logger.debug(f'Text was downloaded to {filepath}')
     return filepath
 
-def fetch_text(url):
+def get_response_or_none(url):
     response = requests.get(url, allow_redirects=False)
     if not is_good_response(response):
         return
-    tululu_logger.debug(f'Text was fetched on url: {url}')
-    return response.text
+    return response
+
+def is_good_response(response):
+    try:
+        response.raise_for_status()
+        if response.status_code in [301, 302, 303, 307, 308]:
+            tululu_logger.debug('Wrong url. Redirect')
+            raise requests.HTTPError()
+    except requests.HTTPError:
+        return 
+    return True
 
 def save_txt(text, filename, folder):
     filename = f'{filename}.txt'
@@ -100,18 +102,6 @@ def download_image(url, filename, folder='images'):
     return filepath
 
 def fetch_image(url):
-    response = requests.get(url, allow_redirects=False)
-    if not is_good_response(response):
-        return
+    response = get_response_or_none(url)
     tululu_logger.debug(f'Image was fetched on url: {url}')
     return response.content
-
-def is_good_response(response):
-    try:
-        response.raise_for_status()
-        if response.status_code in [301, 302, 303, 307, 308]:
-            tululu_logger.debug('Wrong url. Redirect')
-            raise requests.HTTPError()
-    except requests.HTTPError:
-        return 
-    return True
