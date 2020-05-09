@@ -25,8 +25,6 @@ pip install -r requirements.txt
 --skip_imgs — не скачивать обложки книг
 --skip_txt — не скачивать текст книг
 --json_path — указать свой путь к *.json файлу с результатами
---platform — указать платформу PC (дефолтная - windows), возможные варианты:
-  Linux, macOS, Windows
 ```
 Пример использования аргументов: 
 ```

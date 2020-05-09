@@ -7,13 +7,11 @@ import argparse
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from pathvalidate import sanitize_filepath
 
 
 category_logger = logging.getLogger('category_logger')
 
 dest_folder = ''
-platform='windows'
 skip_imgs = False
 skip_txt = False
 
@@ -41,15 +39,12 @@ def parse_args():
     parser.add_argument('-i', '--skip_imgs', action='store_true', help='Не скачивать обложки книг')
     parser.add_argument('-t', '--skip_txt', action='store_true', help='Не скачивать текст книг')
     parser.add_argument('-j', '--json_path', help='Указать свой путь к *.json файлу с результатами')
-    parser.add_argument('-p', '--platform', help='Указать платформу PC (дефолтная - windows)')
     return parser.parse_args()
 
 def handle_global_args(args):
-    global dest_folder, skip_imgs, skip_txt, platform
-    if args.platform:
-        platform = args.platform
+    global dest_folder, skip_imgs, skip_txt
     if args.dest_folder:
-        dest_folder = sanitize_filepath(args.dest_folder, platform=platform)
+        dest_folder =  args.dest_folder
         os.makedirs(dest_folder, exist_ok=True)
     if args.skip_imgs:
         skip_imgs = True
@@ -64,11 +59,9 @@ def handle_page_args(start_page, end_page):
     return start_page, end_page
 
 def handle_json_arg(json_path):
-    global platform
     if not json_path:
         json_path = ''
     else:
-        json_path = sanitize_filepath(json_path, platform=platform)
         os.makedirs(json_path, exist_ok=True)
     return json_path
 

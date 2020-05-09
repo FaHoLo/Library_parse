@@ -27,8 +27,6 @@ Without arguments script will download all books from all pages of [this categor
 --skip_imgs — don't download book images
 --skip_txt — don't download book texts
 --json_path — choose folder to *.json file with books info
---platform — choose PC platform (default is windows), possible options:
-  Linux, macOS, Windows
 ```
 Arguments use example:
 ```
