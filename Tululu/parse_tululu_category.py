@@ -65,8 +65,8 @@ def handle_json_arg(json_path):
 
 def download_category_books(category_url, start_page, end_page, json_path):
     book_urls = get_category_book_urls(category_url, start_page, end_page)
-    book_infos = list(filter(None, [download_book(url) for url in book_urls]))
-    save_json(book_infos, 'book_infos', json_path)
+    book_descriptions = list(filter(None, [download_book(url) for url in book_urls]))
+    save_json(book_descriptions, 'book_descriptions', json_path)
     download_book(book_urls[3])
     category_logger.debug('Books were saved')
 
@@ -109,14 +109,14 @@ def download_book(book_url):
             return
     if not SKIP_IMGS:
         image_path = tululu.download_book_image(book_url, book_webpage, DEST_FOLDER)
-    book_info = collect_book_info(book_webpage, book_path, image_path, title, author)
+    book_description = collect_book_description(book_webpage, book_path, image_path, title, author)
     category_logger.debug(f'Book with id "{book_id}" was downloaded')
-    return book_info
+    return book_description
 
-def collect_book_info(book_webpage, book_path, image_path, title, author):
+def collect_book_description(book_webpage, book_path, image_path, title, author):
     comments = tululu.get_book_comments(book_webpage)
     genres = tululu.get_book_genres(book_webpage)
-    book_info = {
+    book_description = {
         'title': title,
         'author': author,
         'book_path': book_path,
@@ -124,8 +124,8 @@ def collect_book_info(book_webpage, book_path, image_path, title, author):
         'comments': comments,
         'genres': genres,
     }
-    category_logger.debug('Book info collected')
-    return book_info
+    category_logger.debug('Book description collected')
+    return book_description
 
 def save_json(info, filename, json_path=''):
     if json_path:
