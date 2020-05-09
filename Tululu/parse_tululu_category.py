@@ -101,9 +101,7 @@ def get_page_book_urls(page_url):
 
 def fetch_category_webpage(page_url):
     response = requests.get(page_url, allow_redirects=False)
-    response.raise_for_status()
-    if response.status_code == 301:
-        category_logger.debug(f'No page for url: {page_url}')
+    if not tululu.is_good_response(response):
         return
     category_logger.debug(f'Category webpage was fetched')
     return BeautifulSoup(response.text, 'lxml')

@@ -11,10 +11,8 @@ tululu_logger = logging.getLogger('tululu_logger')
 
 def fetch_book_webpage(book_url):
     response = requests.get(book_url, allow_redirects=False)
-    response.raise_for_status()
-    if response.status_code == 302:
-        tululu_logger.debug(f'No book for {book_url}')
-        return None
+    if not is_good_response(response):
+        return
     tululu_logger.debug(f'Book webpage was fetched')
     return BeautifulSoup(response.text, 'lxml')
 
@@ -55,10 +53,8 @@ def download_txt(url, filename, folder='books'):
 
 def fetch_text(url):
     response = requests.get(url, allow_redirects=False)
-    response.raise_for_status()
-    if response.status_code == 301:
-        tululu_logger.debug(f'No text for {url}')
-        return None
+    if not is_good_response(response):
+        return
     tululu_logger.debug(f'Text was fetched on url: {url}')
     return response.text
 
@@ -104,7 +100,18 @@ def download_image(url, filename, folder='images'):
     return filepath
 
 def fetch_image(url):
-    response = requests.get(url)
-    response.raise_for_status()
+    response = requests.get(url, allow_redirects=False)
+    if not is_good_response(response):
+        return
     tululu_logger.debug(f'Image was fetched on url: {url}')
     return response.content
+
+def is_good_response(response):
+    try:
+        response.raise_for_status()
+        if response.status_code in [301, 302, 303, 307, 308]:
+            tululu_logger.debug('Wrong url. Redirect')
+            raise requests.HTTPError()
+    except requests.HTTPError:
+        return 
+    return True
