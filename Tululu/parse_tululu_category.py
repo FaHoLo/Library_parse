@@ -52,11 +52,13 @@ def download_books(book_urls, dest_folder, skip_imgs, skip_txt):
     for url in book_urls:
         try:
             book_descriptions.append(download_book(url, dest_folder, skip_imgs, skip_txt))
-        except HTTPError:
+        except HTTPError as err:
+            category_logger.warning(err)
             continue
         except ConnectionError:
-            category_logger.debug('Start sleeping')
-            sleep(10)
+            sleep_time = 10
+            category_logger.warning(f'Connection error. Start sleeping for {sleep_time} secs')
+            sleep(sleep_time)
             continue
     category_logger.debug('Books were saved')
     return book_descriptions
@@ -70,8 +72,9 @@ def get_category_book_urls(category_url, start_page, end_page):
         except HTTPError:
             break
         except ConnectionError:
-            category_logger.debug('Start sleeping')
-            sleep(10)
+            sleep_time = 10
+            category_logger.warning(f'Connection error. Start sleeping for {sleep_time} secs')
+            sleep(sleep_time)
             continue
         book_urls.extend(urls)
     category_logger.debug(f'Got {len(book_urls)} book urls')
