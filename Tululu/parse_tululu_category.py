@@ -82,31 +82,24 @@ def get_category_book_urls(category_url, start_page, end_page):
     return book_urls
     
 def get_page_book_urls(page_url):
-    webpage = parse_webpage(page_url)
+    response = tululu.get_response(url)
+    webpage = BeautifulSoup(response.text, 'lxml')
     book_tags = webpage.select('.ow_px_td .d_book')
     book_urls = [urljoin(page_url, book_tag.select_one('a')['href']) for book_tag in book_tags]
     category_logger.debug(f'Got urls form page "{page_url}"')
     return book_urls
 
-def parse_webpage(url):
-    response = tululu.get_response(url)
-    return BeautifulSoup(response.text, 'lxml')
-
 def download_book(book_url, dest_folder, skip_imgs, skip_txt):
     book_path = None
     image_path = None
     book_id = book_url.split('/')[-2][1:]
-    book_webpage = parse_webpage(book_url)
+    response = tululu.get_response(url)
+    book_webpage = BeautifulSoup(response.text, 'lxml')
     title, author = tululu.get_book_title_and_author(book_webpage)
     if not skip_txt:
         book_path = tululu.download_book_text(book_id, title, dest_folder)
     if not skip_imgs:
         image_path = tululu.download_book_image(book_url, book_webpage, dest_folder)
-    book_description = collect_book_description(book_webpage, book_path, image_path, title, author)
-    category_logger.debug(f'Book with id "{book_id}" was downloaded')
-    return book_description
-
-def collect_book_description(book_webpage, book_path, image_path, title, author):
     comments = tululu.get_book_comments(book_webpage)
     genres = tululu.get_book_genres(book_webpage)
     book_description = {
@@ -117,7 +110,7 @@ def collect_book_description(book_webpage, book_path, image_path, title, author)
         'comments': comments,
         'genres': genres,
     }
-    category_logger.debug('Book description collected')
+    category_logger.debug(f'Book with id "{book_id}" was downloaded')
     return book_description
 
 def save_json(info, filename, folder='.'):
