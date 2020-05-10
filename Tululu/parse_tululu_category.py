@@ -70,6 +70,7 @@ def get_category_book_urls(category_url, start_page, end_page):
         try:
             urls = get_page_book_urls(page_url)
         except HTTPError:
+            # tululu.org throw redirect when page number out of page amount
             break
         except ConnectionError:
             sleep_time = 10
