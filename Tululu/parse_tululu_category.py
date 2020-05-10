@@ -17,7 +17,8 @@ def main():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         # level='DEBUG',
     )
-    args = parse_args()
+    argparser = configure_argparser()
+    args = argparser.parse_args()
     category_url = 'http://tululu.org/l55/'
     parse_category(category_url, args)
 
@@ -28,9 +29,11 @@ def parse_category(category_url, args):
     dest_folder = get_dest_folder(args)
     start_page, end_page = handle_page_args(args.start_page, args.end_page)
     category_logger.debug('All arguments were parsed and handled')
-    download_category_books(category_url, start_page, end_page, json_path, dest_folder, skip_txt, skip_imgs)
+    book_urls = get_category_book_urls(category_url, start_page, end_page)
+    book_descriptions = download_books(book_urls, dest_folder, skip_imgs, skip_txt)
+    save_json(book_descriptions, 'book_descriptions', json_path)
 
-def parse_args():
+def configure_argparser():
     parser = argparse.ArgumentParser(
         description='Программа скачает книги с сайта tululu.org'
     )
@@ -40,7 +43,7 @@ def parse_args():
     parser.add_argument('-i', '--skip_imgs', action='store_true', help='Не скачивать обложки книг')
     parser.add_argument('-t', '--skip_txt', action='store_true', help='Не скачивать текст книг')
     parser.add_argument('-j', '--json_path', help='Указать свой путь к *.json файлу с результатами')
-    return parser.parse_args()
+    return parser
 
 def get_json_path(args):
     if args.json_path:
@@ -63,8 +66,7 @@ def handle_page_args(start_page, end_page):
         end_page = 9999
     return start_page, end_page
 
-def download_category_books(category_url, start_page, end_page, json_path, dest_folder, skip_imgs, skip_txt):
-    book_urls = get_category_book_urls(category_url, start_page, end_page)
+def download_books(book_urls, dest_folder, skip_imgs, skip_txt):
     book_descriptions = []
     for url in book_urls:
         try:
@@ -75,8 +77,8 @@ def download_category_books(category_url, start_page, end_page, json_path, dest_
             category_logger.debug('Start sleeping')
             sleep(10)
             continue
-    save_json(book_descriptions, 'book_descriptions', json_path)
     category_logger.debug('Books were saved')
+    return book_descriptions
 
 def get_category_book_urls(category_url, start_page, end_page):
     book_urls = []
