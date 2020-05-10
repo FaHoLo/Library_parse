@@ -11,9 +11,9 @@ from requests import HTTPError, ConnectionError
 
 category_logger = logging.getLogger('category_logger')
 
-DEST_FOLDER = ''
-SKIP_IMGS = False
-SKIP_TXT = False
+dest_folder = ''
+skip_imgs = False
+skip_txt = False
 
 
 def main():
@@ -42,12 +42,12 @@ def parse_args():
     return parser.parse_args()
 
 def handle_global_args(args):
-    global DEST_FOLDER, SKIP_IMGS, SKIP_TXT
+    global dest_folder, skip_imgs, skip_txt
     if args.dest_folder:
-        DEST_FOLDER = args.dest_folder
-        os.makedirs(DEST_FOLDER, exist_ok=True)
-    SKIP_IMGS = args.skip_imgs
-    SKIP_TXT = args.skip_txt
+        dest_folder = args.dest_folder
+        os.makedirs(dest_folder, exist_ok=True)
+    skip_imgs = args.skip_imgs
+    skip_txt = args.skip_txt
 
 def handle_page_args(start_page, end_page):
     if not start_page:
@@ -111,10 +111,10 @@ def download_book(book_url):
     book_id = book_url.split('/')[-2][1:]
     book_webpage = parse_webpage(book_url)
     title, author = tululu.get_book_title_and_author(book_webpage)
-    if not SKIP_TXT:
-        book_path = tululu.download_book_text(book_id, title, DEST_FOLDER)
-    if not SKIP_IMGS:
-        image_path = tululu.download_book_image(book_url, book_webpage, DEST_FOLDER)
+    if not skip_txt:
+        book_path = tululu.download_book_text(book_id, title, dest_folder)
+    if not skip_imgs:
+        image_path = tululu.download_book_image(book_url, book_webpage, dest_folder)
     book_description = collect_book_description(book_webpage, book_path, image_path, title, author)
     category_logger.debug(f'Book with id "{book_id}" was downloaded')
     return book_description
@@ -137,7 +137,7 @@ def save_json(info, filename, json_path=''):
     if json_path:
         folder = json_path
     else:
-        folder = DEST_FOLDER
+        folder = dest_folder
     filename = f'{filename}.json'
     filepath = os.path.join(folder, filename)
     with open(filepath, 'w', encoding='utf8') as file:
