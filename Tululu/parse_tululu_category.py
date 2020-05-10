@@ -11,10 +11,6 @@ from requests import HTTPError, ConnectionError
 
 category_logger = logging.getLogger('category_logger')
 
-dest_folder = ''
-skip_imgs = False
-skip_txt = False
-
 
 def main():
     logging.basicConfig(
@@ -22,12 +18,17 @@ def main():
         # level='DEBUG',
     )
     args = parse_args()
-    handle_global_args(args)
-    start_page, end_page = handle_page_args(args.start_page, args.end_page)
-    json_path = handle_json_arg(args.json_path)
-    category_logger.debug('All arguments were parsed and handled')
     category_url = 'http://tululu.org/l55/'
-    download_category_books(category_url, start_page, end_page, json_path)
+    parse_category(category_url, args)
+
+def parse_category(category_url, args):
+    skip_txt = args.skip_txt
+    skip_imgs = args.skip_imgs
+    json_path = get_json_path(args)
+    dest_folder = get_dest_folder(args)
+    start_page, end_page = handle_page_args(args.start_page, args.end_page)
+    category_logger.debug('All arguments were parsed and handled')
+    download_category_books(category_url, start_page, end_page, json_path, dest_folder, skip_txt, skip_imgs)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -41,13 +42,19 @@ def parse_args():
     parser.add_argument('-j', '--json_path', help='Указать свой путь к *.json файлу с результатами')
     return parser.parse_args()
 
-def handle_global_args(args):
-    global dest_folder, skip_imgs, skip_txt
+def get_json_path(args):
+    if args.json_path:
+        os.makedirs(args.json_path, exist_ok=True)
+        return args.json_path
+    elif args.dest_folder:
+        return args.dest_folder
+    return ''
+
+def get_dest_folder(args):
     if args.dest_folder:
-        dest_folder = args.dest_folder
-        os.makedirs(dest_folder, exist_ok=True)
-    skip_imgs = args.skip_imgs
-    skip_txt = args.skip_txt
+        os.makedirs(args.dest_folder, exist_ok=True)
+        return args.dest_folder
+    return ''
 
 def handle_page_args(start_page, end_page):
     if not start_page:
@@ -56,19 +63,12 @@ def handle_page_args(start_page, end_page):
         end_page = 9999
     return start_page, end_page
 
-def handle_json_arg(json_path):
-    if not json_path:
-        json_path = ''
-    else:
-        os.makedirs(json_path, exist_ok=True)
-    return json_path
-
-def download_category_books(category_url, start_page, end_page, json_path):
+def download_category_books(category_url, start_page, end_page, json_path, dest_folder, skip_imgs, skip_txt):
     book_urls = get_category_book_urls(category_url, start_page, end_page)
     book_descriptions = []
     for url in book_urls:
         try:
-            book_descriptions.append(download_book(url))
+            book_descriptions.append(download_book(url, dest_folder, skip_imgs, skip_txt))
         except HTTPError:
             continue
         except ConnectionError:
@@ -105,7 +105,7 @@ def parse_webpage(url):
     response = tululu.get_response(url)
     return BeautifulSoup(response.text, 'lxml')
 
-def download_book(book_url):
+def download_book(book_url, dest_folder, skip_imgs, skip_txt):
     book_path = ''
     image_path = ''
     book_id = book_url.split('/')[-2][1:]
@@ -133,11 +133,7 @@ def collect_book_description(book_webpage, book_path, image_path, title, author)
     category_logger.debug('Book description collected')
     return book_description
 
-def save_json(info, filename, json_path=''):
-    if json_path:
-        folder = json_path
-    else:
-        folder = dest_folder
+def save_json(info, filename, folder=''):
     filename = f'{filename}.json'
     filepath = os.path.join(folder, filename)
     with open(filepath, 'w', encoding='utf8') as file:
