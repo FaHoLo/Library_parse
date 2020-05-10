@@ -44,12 +44,9 @@ def download_txt(url, filename, folder='books'):
 
 def get_response(url):
     response = requests.get(url, allow_redirects=False)
-    check_response(response)
-    return response
-
-def check_response(response):
     if response.status_code >= 300:
         raise requests.HTTPError()
+    return response
 
 def save_txt(text, filename, folder):
     filename = f'{filename}.txt'
