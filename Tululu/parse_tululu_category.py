@@ -41,7 +41,7 @@ def configure_argparser():
     return parser
 
 def get_json_path(args):
-    if arg.json_path == '.' and args.dest_folder != '.':
+    if args.json_path == '.' and args.dest_folder != '.':
         return args.dest_folder
     os.makedirs(args.json_path, exist_ok=True)
     return args.json_path
