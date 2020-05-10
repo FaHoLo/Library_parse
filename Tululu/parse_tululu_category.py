@@ -23,50 +23,31 @@ def main():
     parse_category(category_url, args)
 
 def parse_category(category_url, args):
-    skip_txt = args.skip_txt
-    skip_imgs = args.skip_imgs
     json_path = get_json_path(args)
-    dest_folder = get_dest_folder(args)
-    start_page, end_page = handle_page_args(args.start_page, args.end_page)
-    category_logger.debug('All arguments were parsed and handled')
-    book_urls = get_category_book_urls(category_url, start_page, end_page)
-    book_descriptions = download_books(book_urls, dest_folder, skip_imgs, skip_txt)
+    book_urls = get_category_book_urls(category_url, args.start_page, args.end_page)
+    book_descriptions = download_books(book_urls, args.dest_folder, args.skip_imgs, args.skip_txt)
     save_json(book_descriptions, 'book_descriptions', json_path)
 
 def configure_argparser():
     parser = argparse.ArgumentParser(
         description='Программа скачает книги с сайта tululu.org'
     )
-    parser.add_argument('-s', '--start_page', type=int, help='Номер первой страницы скачивания')
-    parser.add_argument('-e', '--end_page', type=int, help='Номер страницы, до которой будут скачаны книги')
-    parser.add_argument('-d', '--dest_folder', help='Путь к каталогу с результатами парсинга: картинкам, книгами, json')
+    parser.add_argument('-s', '--start_page', type=int, default=1, help='Номер первой страницы скачивания')
+    parser.add_argument('-e', '--end_page', type=int, default=9999, help='Номер страницы, до которой будут скачаны книги')
+    parser.add_argument('-d', '--dest_folder', default='.', help='Путь к каталогу с результатами парсинга: картинкам, книгами, json')
     parser.add_argument('-i', '--skip_imgs', action='store_true', help='Не скачивать обложки книг')
     parser.add_argument('-t', '--skip_txt', action='store_true', help='Не скачивать текст книг')
-    parser.add_argument('-j', '--json_path', help='Указать свой путь к *.json файлу с результатами')
+    parser.add_argument('-j', '--json_path', default='.', help='Указать свой путь к *.json файлу с результатами')
     return parser
 
 def get_json_path(args):
-    if args.json_path:
-        os.makedirs(args.json_path, exist_ok=True)
-        return args.json_path
-    elif args.dest_folder:
+    if arg.json_path == '.' and args.dest_folder != '.':
         return args.dest_folder
-    return ''
-
-def get_dest_folder(args):
-    if args.dest_folder:
-        os.makedirs(args.dest_folder, exist_ok=True)
-        return args.dest_folder
-    return ''
-
-def handle_page_args(start_page, end_page):
-    if not start_page:
-        start_page = 1
-    if not end_page:
-        end_page = 9999
-    return start_page, end_page
+    os.makedirs(args.json_path, exist_ok=True)
+    return args.json_path
 
 def download_books(book_urls, dest_folder, skip_imgs, skip_txt):
+    os.makedirs(dest_folder, exist_ok=True)
     book_descriptions = []
     for url in book_urls:
         try:
@@ -135,7 +116,7 @@ def collect_book_description(book_webpage, book_path, image_path, title, author)
     category_logger.debug('Book description collected')
     return book_description
 
-def save_json(info, filename, folder=''):
+def save_json(info, filename, folder='.'):
     filename = f'{filename}.json'
     filepath = os.path.join(folder, filename)
     with open(filepath, 'w', encoding='utf8') as file:
