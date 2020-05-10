@@ -89,8 +89,8 @@ def parse_webpage(url):
     return BeautifulSoup(response.text, 'lxml')
 
 def download_book(book_url, dest_folder, skip_imgs, skip_txt):
-    book_path = ''
-    image_path = ''
+    book_path = None
+    image_path = None
     book_id = book_url.split('/')[-2][1:]
     book_webpage = parse_webpage(book_url)
     title, author = tululu.get_book_title_and_author(book_webpage)
