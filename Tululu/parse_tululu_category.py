@@ -20,10 +20,10 @@ def main():
     argparser = configure_argparser()
     args = argparser.parse_args()
     category_url = 'http://tululu.org/l55/'
-    parse_category(category_url, args)
+    json_path = choose_json_path(args.json_path, args.dest_folder)
+    parse_category(category_url, args.start_page, args.end_page, args.dest_folder, json_path, args.skip_imgs, args.skip_txt)
 
-def parse_category(category_url, args):
-    json_path = get_json_path(args)
+def parse_category(category_url, start_page, end_page, dest_folder, json_path, skip_imgs, skip_txt):
     book_urls = get_category_book_urls(category_url, args.start_page, args.end_page)
     book_descriptions = download_books(book_urls, args.dest_folder, args.skip_imgs, args.skip_txt)
     save_json(book_descriptions, 'book_descriptions', json_path)
@@ -40,11 +40,11 @@ def configure_argparser():
     parser.add_argument('-j', '--json_path', default='.', help='Указать свой путь к *.json файлу с результатами')
     return parser
 
-def get_json_path(args):
-    if args.json_path == '.' and args.dest_folder != '.':
-        return args.dest_folder
-    os.makedirs(args.json_path, exist_ok=True)
-    return args.json_path
+def choose_json_path(json_path, dest_folder):
+    if json_path == '.' and dest_folder != '.':
+        return dest_folder
+    os.makedirs(json_path, exist_ok=True)
+    return json_path
 
 def download_books(book_urls, dest_folder, skip_imgs, skip_txt):
     os.makedirs(dest_folder, exist_ok=True)
