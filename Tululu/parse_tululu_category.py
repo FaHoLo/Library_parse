@@ -1,12 +1,14 @@
-import os
-import json
-import tululu
-import logging
 import argparse
+import json
+import logging
+import os
 from time import sleep
+
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 from requests import HTTPError, ConnectionError
+from urllib.parse import urljoin
+
+import tululu
 
 
 category_logger = logging.getLogger('category_logger')
@@ -23,10 +25,12 @@ def main():
     json_path = choose_json_path(args.json_path, args.dest_folder)
     parse_category(category_url, args.start_page, args.end_page, args.dest_folder, json_path, args.skip_imgs, args.skip_txt)
 
+
 def parse_category(category_url, start_page, end_page, dest_folder, json_path, skip_imgs, skip_txt):
-    book_urls = get_category_book_urls(category_url, args.start_page, args.end_page)
-    book_descriptions = download_books(book_urls, args.dest_folder, args.skip_imgs, args.skip_txt)
+    book_urls = get_category_book_urls(category_url, start_page, end_page)
+    book_descriptions = download_books(book_urls, dest_folder, skip_imgs, skip_txt)
     save_json(book_descriptions, 'book_descriptions', json_path)
+
 
 def configure_argparser():
     parser = argparse.ArgumentParser(
@@ -40,11 +44,13 @@ def configure_argparser():
     parser.add_argument('-j', '--json_path', default='.', help='Указать свой путь к *.json файлу с результатами')
     return parser
 
+
 def choose_json_path(json_path, dest_folder):
     if json_path == '.' and dest_folder != '.':
         return dest_folder
     os.makedirs(json_path, exist_ok=True)
     return json_path
+
 
 def download_books(book_urls, dest_folder, skip_imgs, skip_txt):
     os.makedirs(dest_folder, exist_ok=True)
@@ -63,6 +69,7 @@ def download_books(book_urls, dest_folder, skip_imgs, skip_txt):
     category_logger.debug('Books were saved')
     return book_descriptions
 
+
 def get_category_book_urls(category_url, start_page, end_page):
     book_urls = []
     for page in range(start_page, end_page):
@@ -80,20 +87,22 @@ def get_category_book_urls(category_url, start_page, end_page):
         book_urls.extend(urls)
     category_logger.debug(f'Got {len(book_urls)} book urls')
     return book_urls
-    
+
+
 def get_page_book_urls(page_url):
-    response = tululu.get_response(url)
+    response = tululu.get_response(page_url)
     webpage = BeautifulSoup(response.text, 'lxml')
     book_tags = webpage.select('.ow_px_td .d_book')
     book_urls = [urljoin(page_url, book_tag.select_one('a')['href']) for book_tag in book_tags]
     category_logger.debug(f'Got urls form page "{page_url}"')
     return book_urls
 
+
 def download_book(book_url, dest_folder, skip_imgs, skip_txt):
     book_path = None
     image_path = None
     book_id = book_url.split('/')[-2][1:]
-    response = tululu.get_response(url)
+    response = tululu.get_response(book_url)
     book_webpage = BeautifulSoup(response.text, 'lxml')
     title, author = tululu.get_book_title_and_author(book_webpage)
     if not skip_txt:
@@ -112,6 +121,7 @@ def download_book(book_url, dest_folder, skip_imgs, skip_txt):
     }
     category_logger.debug(f'Book with id "{book_id}" was downloaded')
     return book_description
+
 
 def save_json(info, filename, folder='.'):
     filename = f'{filename}.json'
