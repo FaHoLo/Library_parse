@@ -114,8 +114,8 @@ def download_book(book_url, dest_folder, skip_imgs, skip_txt):
     book_description = {
         'title': title,
         'author': author,
-        'book_path': book_path.replace('\\', '/'),
-        'image_path': image_path.replace('\\', '/'),
+        'book_path': book_path,
+        'image_path': image_path,
         'comments': comments,
         'genres': genres,
     }
