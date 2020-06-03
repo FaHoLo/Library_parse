@@ -69,6 +69,8 @@ def build_filepath(filename, folder):
     folder = folder.rstrip('/\\')
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
+    if os.sep == '\\':
+        filepath = filepath.replace('\\', '/')
     tululu_logger.debug(f'Filepath "{filepath}" was collected')
     return filepath
 
