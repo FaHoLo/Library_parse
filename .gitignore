@@ -64,9 +64,3 @@ venv.bak/
 
 # VSCode
 .vscode/
-
-# Media
-books/
-images/
-pages/
-book_descriptions.json
