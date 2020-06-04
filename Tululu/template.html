@@ -48,6 +48,10 @@
                   <div class="card-body">
                     <h5 class="card-title">{{left_book.title}}</h5>
                     <p class="card-text">{{left_book.author}}</p>
+                    {% for genre in left_book.genres %}
+                      <span class="badge badge-light">{{genre}}</span>
+                    {% endfor %}
+                    <p></p>
                     <a href=".{{left_book.book_path|urlencode}}" target="_blank">Читать</a>
                   </div>
                 </div>
@@ -64,6 +68,10 @@
                   <div class="card-body">
                     <h5 class="card-title">{{right_book.title}}</h5>
                     <p class="card-text">{{right_book.author}}</p>
+                    {% for genre in right_book.genres %}
+                      <span class="badge badge-light">{{genre}}</span>
+                    {% endfor %}
+                    <p></p>
                     <a href=".{{right_book.book_path|urlencode}}" target="_blank">Читать</a>
                   </div>
                 </div>
