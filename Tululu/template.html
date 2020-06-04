@@ -39,7 +39,9 @@
             {% endif %}
           {% endfor %}
           {% if page_number == page_amount %}
-            <li class="page-item disabled"><a class="page-link" href="./index{{page_number+1}}.html" tabindex="-1" aria-disabled="true">Вперед</a></li>
+            <li class="page-item disabled">
+              <a class="page-link" href="./index{{page_number+1}}.html" tabindex="-1" aria-disabled="true">Вперед</a>
+            </li>
           {% else %}
             <li class="page-item"><a class="page-link" href="./index{{page_number+1}}.html">Вперед</a></li>
           {% endif %}
