@@ -2,6 +2,7 @@ import json
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
+from more_itertools import chunked
 
 
 def main():
@@ -18,6 +19,7 @@ def render_index_page():
     )
     with open('book_descriptions.json', 'r') as json_file:
         books = json.loads(json_file.read())
+    books = list(chunked(books, 2))
 
     template = env.get_template('template.html')
     rendered_page = template.render(books=books)
