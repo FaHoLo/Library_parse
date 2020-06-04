@@ -1,4 +1,5 @@
 import json
+from math import ceil
 import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -15,7 +16,8 @@ def main():
 
 def render_index_pages():
     books_on_page = 10
-    rows_in_column = int(books_on_page / 2)
+    columns_amount = 2
+    rows_amount = ceil(books_on_page / columns_amount)
     dest_folder = 'pages'
     env = Environment(
         loader=FileSystemLoader('.'),
@@ -24,13 +26,17 @@ def render_index_pages():
     with open('book_descriptions.json', 'r') as json_file:
         books = json.loads(json_file.read())
 
-    books = list(chunked(chunked(books, 2), rows_in_column))
+    books = list(chunked(chunked(books, columns_amount), rows_amount))
     template = env.get_template('template.html')
     os.makedirs(dest_folder, exist_ok=True)
 
+    page_amount = len(books)
     for page_number, page_books in enumerate(books):
-        rendered_page = template.render(books=page_books)
-        filepath = os.path.join(dest_folder, f'index{page_number+1}.html')
+        page_number += 1
+        rendered_page = template.render(books=page_books,
+                                        page_number=page_number,
+                                        page_amount=page_amount)
+        filepath = os.path.join(dest_folder, f'index{page_number}.html')
         with open(filepath, 'w', encoding='utf8') as file:
             file.write(rendered_page)
 
