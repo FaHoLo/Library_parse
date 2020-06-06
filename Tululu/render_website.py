@@ -27,7 +27,7 @@ def configure_argparser():
     return parser
 
 
-def render_library_pages(books_on_page=10, columns_amount=2, dest_folder='pages'):
+def render_library_pages(books_on_page=20, columns_amount=2, dest_folder='pages'):
     rows_amount = ceil(books_on_page / columns_amount)
     os.makedirs(dest_folder, exist_ok=True)
 
