@@ -1,4 +1,4 @@
-import argparser
+import argparse
 import json
 from math import ceil
 import os
@@ -10,17 +10,17 @@ from more_itertools import chunked
 
 def main():
     parser = configure_argparser()
-    parser.parse_args()
+    args = parser.parse_args()
     render_library_pages()
 
-    if parser.run_debug:
+    if args.run_debug:
         server = Server()
         server.watch('template.html', render_library_pages)
         server.serve(port=5501, root='.')
 
 
 def configure_argparser():
-    parser = argparser.ArgumentParser(
+    parser = argparse.ArgumentParser(
         description='Программа отрендерит страницы библиотеки'
     )
     parser.add_argument('-d', '--run_debug', action='store_true', help='Запустить в режиме разработки (livereload)')
