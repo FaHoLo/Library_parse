@@ -2,6 +2,12 @@
 
 Проект был создан для парсинга книг с сайта [tululu.org](http:/tululu.org) и создания собственной онлайн/офлайн библиотеки.
 
+### Пример библиотеки
+
+![Website screenshot](example.jpg)
+
+[Website in work](https://faholo.github.io/Library_parse/) 
+
 ### Установка
 
 1. Python3 должен быть уже установлен.  
