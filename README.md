@@ -5,7 +5,7 @@ The project was created for parse books from [tululu.org](http://tululu.org) and
 
 [Russian doc](https://github.com/FaHoLo/Library_parse/blob/master/READMEru.md)
 
-### Website example:
+### Library example:
 
 ![Website screenshot](example.jpg)
 
