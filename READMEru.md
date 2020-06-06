@@ -6,7 +6,7 @@
 
 ![Website screenshot](example.jpg)
 
-[Рабочий сайт](https://faholo.github.io/Library_parse/) 
+[Сайт библиотеки](https://faholo.github.io/Library_parse/) 
 
 ### Установка
 
