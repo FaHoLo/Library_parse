@@ -1,4 +1,5 @@
 import argparse
+from glob import glob
 import json
 from math import ceil
 import os
@@ -41,6 +42,10 @@ def render_library_pages(books_on_page=20, columns_amount=2, dest_folder='pages'
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('template.html')
+
+    old_page_paths = glob(os.path.join(dest_folder, 'index*.html'))
+    for path in old_page_paths:
+        os.remove(path)
 
     for page_number, page_books in enumerate(books):
         page_number += 1
